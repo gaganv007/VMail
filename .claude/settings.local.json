@@ -78,7 +78,10 @@
       "Bash(aws s3api create-bucket:*)",
       "Bash(aws s3api put-bucket-notification-configuration:*)",
       "Bash(aws lambda update-function-configuration:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(aws lambda get-function-configuration:*)",
+      "Bash(aws ses list-verified-email-addresses:*)",
+      "Bash(aws ses list-identities:*)"
     ],
     "deny": [],
     "ask": []

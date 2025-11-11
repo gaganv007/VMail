@@ -1,89 +1,118 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import './Auth.css';
+import { useNavigate, Link } from 'react-router-dom';
+import { signUp, confirmSignUp } from 'aws-amplify/auth';
+import './Login.css';
 
 const Signup = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
-  });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [step, setStep] = useState(1);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [confirmationCode, setConfirmationCode] = useState('');
-  const { register, confirmSignup } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleSubmit = async (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
     setError('');
-
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    if (formData.password.length < 8) {
-      setError('Password must be at least 8 characters long');
-      return;
-    }
-
+    setSuccess('');
     setLoading(true);
 
     try {
-      const result = await register(formData.email, formData.password, formData.name);
-      if (result.success) {
-        setShowConfirmation(true);
-      }
+      await signUp({
+        username: email,
+        password: password,
+        options: {
+          userAttributes: {
+            email: email,
+          },
+        },
+      });
+      setSuccess('Verification code sent to your email!');
+      setStep(2);
     } catch (err) {
-      setError(err.message || 'Failed to create account. Please try again.');
+      console.error('Signup error:', err);
+      setError(err.message || 'Failed to sign up');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleConfirmation = async (e) => {
+  const handleVerify = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-      await confirmSignup(formData.email, confirmationCode);
-      navigate('/login');
+      await confirmSignUp({
+        username: email,
+        confirmationCode: confirmationCode,
+      });
+      setSuccess('Account verified! Redirecting to login...');
+      setTimeout(() => navigate('/login'), 2000);
     } catch (err) {
-      setError(err.message || 'Invalid confirmation code. Please try again.');
+      console.error('Verification error:', err);
+      setError(err.message || 'Failed to verify code');
     } finally {
       setLoading(false);
     }
   };
 
-  if (showConfirmation) {
-    return (
-      <div className="auth-container">
-        <div className="auth-box">
-          <div className="auth-header">
-            <h1>Confirm Your Email</h1>
-            <p>We've sent a confirmation code to {formData.email}</p>
-          </div>
+  return (
+    <div className="auth-container">
+      <div className="auth-box">
+        <div className="auth-logo">
+          <svg viewBox="0 0 24 24" fill="#1a73e8">
+            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+          </svg>
+        </div>
 
-          <form onSubmit={handleConfirmation} className="auth-form">
-            {error && <div className="error-message">{error}</div>}
+        <div className="auth-title">
+          {step === 1 ? 'Create VMail Account' : 'Verify Your Email'}
+        </div>
+
+        {step === 1 ? (
+          <form className="auth-form" onSubmit={handleSignup}>
+            <div className="form-group">
+              <label className="form-label">Email</label>
+              <input
+                type="email"
+                className="form-input"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your@email.com"
+                required
+              />
+            </div>
 
             <div className="form-group">
-              <label htmlFor="code">Confirmation Code</label>
+              <label className="form-label">Password</label>
               <input
-                id="code"
+                type="password"
+                className="form-input"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Minimum 8 characters"
+                required
+                minLength="8"
+              />
+            </div>
+
+            {error && <div className="error-message">{error}</div>}
+            {success && <div className="success-message">{success}</div>}
+
+            <button type="submit" className="auth-btn" disabled={loading}>
+              {loading ? 'Creating account...' : 'Sign Up'}
+            </button>
+          </form>
+        ) : (
+          <form className="auth-form" onSubmit={handleVerify}>
+            <div className="form-group">
+              <label className="form-label">Verification Code</label>
+              <input
                 type="text"
+                className="form-input"
                 value={confirmationCode}
                 onChange={(e) => setConfirmationCode(e.target.value)}
                 placeholder="Enter 6-digit code"
@@ -91,97 +120,17 @@ const Signup = () => {
               />
             </div>
 
-            <button
-              type="submit"
-              className="btn-primary"
-              disabled={loading}
-            >
-              {loading ? 'Confirming...' : 'Confirm'}
+            {error && <div className="error-message">{error}</div>}
+            {success && <div className="success-message">{success}</div>}
+
+            <button type="submit" className="auth-btn" disabled={loading}>
+              {loading ? 'Verifying...' : 'Verify'}
             </button>
           </form>
-        </div>
-      </div>
-    );
-  }
+        )}
 
-  return (
-    <div className="auth-container">
-      <div className="auth-box">
-        <div className="auth-header">
-          <h1>VMail</h1>
-          <p>Create your account</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="auth-form">
-          {error && <div className="error-message">{error}</div>}
-
-          <div className="form-group">
-            <label htmlFor="name">Full Name</label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="John Doe"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="you@example.com"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="••••••••"
-              required
-            />
-            <small>Must be at least 8 characters</small>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="confirmPassword">Confirm Password</label>
-            <input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              placeholder="••••••••"
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="btn-primary"
-            disabled={loading}
-          >
-            {loading ? 'Creating Account...' : 'Sign Up'}
-          </button>
-        </form>
-
-        <div className="auth-footer">
-          <p>
-            Already have an account?{' '}
-            <Link to="/login">Sign in</Link>
-          </p>
+        <div className="auth-link">
+          Already have an account? <Link to="/login">Sign in</Link>
         </div>
       </div>
     </div>

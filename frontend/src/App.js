@@ -52,19 +52,15 @@ function App() {
             <Routes>
               <Route
                 path="/login"
-                element={!isAuthenticated ? <Login onLogin={() => setIsAuthenticated(true)} /> : <Navigate to="/dashboard" />}
+                element={!isAuthenticated ? <Login onLogin={checkAuthState} /> : <Navigate to="/" />}
               />
               <Route
                 path="/signup"
-                element={!isAuthenticated ? <Signup /> : <Navigate to="/dashboard" />}
+                element={!isAuthenticated ? <Signup /> : <Navigate to="/" />}
               />
               <Route
-                path="/dashboard/*"
+                path="/*"
                 element={isAuthenticated ? <GmailLayout user={user} /> : <Navigate to="/login" />}
-              />
-              <Route
-                path="/"
-                element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />}
               />
             </Routes>
           </div>
