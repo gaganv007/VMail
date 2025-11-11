@@ -77,7 +77,8 @@
       "Bash(aws dynamodb get-item:*)",
       "Bash(aws s3api create-bucket:*)",
       "Bash(aws s3api put-bucket-notification-configuration:*)",
-      "Bash(aws lambda update-function-configuration:*)"
+      "Bash(aws lambda update-function-configuration:*)",
+      "Bash(npm install:*)"
     ],
     "deny": [],
     "ask": []

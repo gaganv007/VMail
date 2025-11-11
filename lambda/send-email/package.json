@@ -1,0 +1,10 @@
+{
+  "name": "vmail-send-email",
+  "version": "1.0.0",
+  "description": "Send email using Nodemailer",
+  "main": "lambda_function.js",
+  "dependencies": {
+    "nodemailer": "^6.9.7",
+    "aws-sdk": "^2.1496.0"
+  }
+}
