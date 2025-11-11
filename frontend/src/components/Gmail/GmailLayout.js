@@ -41,7 +41,7 @@ const GmailLayout = ({ user }) => {
       setError(null);
 
       // Try to load emails from the API
-      const response = await EmailService.listEmails();
+      const response = await EmailService.listEmails(activeFolder);
 
       // Filter emails based on active folder
       let filteredEmails = response.emails || [];

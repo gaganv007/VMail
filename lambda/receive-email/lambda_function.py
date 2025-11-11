@@ -9,11 +9,13 @@ from email import policy
 dynamodb = boto3.resource('dynamodb', region_name=os.environ.get('AWS_REGION', 'us-east-1'))
 s3 = boto3.client('s3', region_name=os.environ.get('AWS_REGION', 'us-east-1'))
 sns = boto3.client('sns', region_name=os.environ.get('AWS_REGION', 'us-east-1'))
+cognito = boto3.client('cognito-idp', region_name=os.environ.get('AWS_REGION', 'us-east-1'))
 
 # Environment variables
 DYNAMODB_TABLE = os.environ.get('DYNAMODB_TABLE', 'vmail-emails')
 S3_BUCKET = os.environ.get('S3_BUCKET', 'vmail-emails-bucket')
 SNS_TOPIC_ARN = os.environ.get('SNS_TOPIC_ARN')
+USER_POOL_ID = os.environ.get('USER_POOL_ID', 'us-east-1_mCoiqnWRI')
 
 def lambda_handler(event, context):
     """
@@ -161,18 +163,23 @@ def lambda_handler(event, context):
 def get_user_id_from_email(email_address):
     """
     Get user ID from Cognito based on email address
-    In production, this would query Cognito User Pool
-    For now, returns a placeholder
     """
-    # TODO: Implement Cognito lookup
-    # Example:
-    # cognito = boto3.client('cognito-idp')
-    # response = cognito.list_users(
-    #     UserPoolId=USER_POOL_ID,
-    #     Filter=f'email = "{email_address}"'
-    # )
-    # if response['Users']:
-    #     return response['Users'][0]['Username']
+    try:
+        response = cognito.list_users(
+            UserPoolId=USER_POOL_ID,
+            Filter=f'email = "{email_address}"'
+        )
 
-    # For now, return email as user ID (replace @ and . with -)
-    return email_address.replace('@', '-').replace('.', '-')
+        if response['Users'] and len(response['Users']) > 0:
+            # Get the sub (user ID) from attributes
+            for attr in response['Users'][0]['Attributes']:
+                if attr['Name'] == 'sub':
+                    return attr['Value']
+            # Fallback to Username
+            return response['Users'][0]['Username']
+
+        print(f"No user found for email: {email_address}")
+        return None
+    except Exception as e:
+        print(f"Error looking up user: {str(e)}")
+        return None

@@ -33,15 +33,16 @@ def lambda_handler(event, context):
         # Query DynamoDB
         table = dynamodb.Table(DYNAMODB_TABLE)
 
-        # Use GSI (Global Secondary Index) for querying by userId and folder
-        response = table.query(
-            IndexName='userId-folder-index',
-            KeyConditionExpression=Key('userId').eq(user_id) & Key('folder').eq(folder),
-            ScanIndexForward=False,  # Sort by timestamp descending
+        # Scan table and filter by userId and folder (GSI may not be populated yet)
+        response = table.scan(
+            FilterExpression=Attr('userId').eq(user_id) & Attr('folder').eq(folder),
             Limit=limit
         )
 
         emails = response.get('Items', [])
+
+        # Sort by timestamp descending
+        emails = sorted(emails, key=lambda x: x.get('timestamp', ''), reverse=True)
 
         # Format emails for frontend
         formatted_emails = []

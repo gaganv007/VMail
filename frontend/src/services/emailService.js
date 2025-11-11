@@ -34,7 +34,7 @@ class EmailService {
       }
 
       const data = await response.json();
-      return data.emails || [];
+      return data;
     } catch (error) {
       console.error('Error listing emails:', error);
       throw error;

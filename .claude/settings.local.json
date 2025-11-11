@@ -72,7 +72,12 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(gh auth status:*)",
-      "Bash(gh auth login:*)"
+      "Bash(gh auth login:*)",
+      "Bash(aws logs describe-log-streams:*)",
+      "Bash(aws dynamodb get-item:*)",
+      "Bash(aws s3api create-bucket:*)",
+      "Bash(aws s3api put-bucket-notification-configuration:*)",
+      "Bash(aws lambda update-function-configuration:*)"
     ],
     "deny": [],
     "ask": []
