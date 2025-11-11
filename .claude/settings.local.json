@@ -81,7 +81,18 @@
       "Bash(npm install:*)",
       "Bash(aws lambda get-function-configuration:*)",
       "Bash(aws ses list-verified-email-addresses:*)",
-      "Bash(aws ses list-identities:*)"
+      "Bash(aws ses list-identities:*)",
+      "Bash(timeout 60 aws logs tail:*)",
+      "Bash(aws logs get-log-events:*)",
+      "Bash(open \"https://app.sendgrid.com/settings/sender_auth/senders\")",
+      "Bash(echo:*)",
+      "Bash(__NEW_LINE__ open \"https://app.sendgrid.com/settings/sender_auth/senders\")",
+      "Bash(aws lambda invoke:*)",
+      "Bash(for resource_id in dhnpyx 0buf8e 0e5adc fwnl03)",
+      "Bash(do echo \"Enabling CORS for resource: $resource_id\" aws apigateway put-method --rest-api-id 6izcc4sd18 --resource-id $resource_id --http-method OPTIONS --authorization-type NONE --region us-east-1)",
+      "Bash(__NEW_LINE__)",
+      "Bash(aws lambda get-policy:*)",
+      "Bash(aws lambda remove-permission:*)"
     ],
     "deny": [],
     "ask": []

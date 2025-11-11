@@ -31,8 +31,11 @@ const GmailLayout = ({ user }) => {
   const loadEmails = async () => {
     try {
       setLoading(true);
+      console.log('Loading emails for folder:', activeFolder);
       const response = await EmailService.listEmails(activeFolder);
+      console.log('Received emails:', response);
       const emailList = response.emails || [];
+      console.log('Email count:', emailList.length);
       setEmails(emailList);
       setFilteredEmails(emailList);
     } catch (err) {
@@ -79,9 +82,10 @@ const GmailLayout = ({ user }) => {
     try {
       await EmailService.sendEmail(emailData);
       setShowCompose(false);
-      if (activeFolder === 'sent') {
-        await loadEmails();
-      }
+      // Switch to sent folder and reload
+      setActiveFolder('sent');
+      // Show success message
+      alert('Email sent successfully!');
     } catch (err) {
       throw err;
     }

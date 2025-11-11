@@ -7,38 +7,36 @@ const s3 = new AWS.S3({ region: 'ap-south-2' });
 const DYNAMODB_TABLE = process.env.DYNAMODB_TABLE || 'vmail-emails';
 const S3_BUCKET = process.env.S3_BUCKET || 'vmail-emails-059409992687';
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
-const SENDGRID_FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || 'noreply@yourdomain.com';
+const SENDGRID_FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || 'gagan_veginati@srmap.edu.in';
 
-// Initialize SendGrid
-if (SENDGRID_API_KEY) {
-  sgMail.setApiKey(SENDGRID_API_KEY);
-}
+// Initialize SendGrid with API key
+sgMail.setApiKey(SENDGRID_API_KEY);
 
 exports.handler = async (event, context) => {
+  console.log('Send email handler started');
   try {
     // Extract user info from Cognito authorizer
     const userId = event.requestContext.authorizer.claims.sub;
     const userEmail = event.requestContext.authorizer.claims.email;
+    console.log('User:', userEmail, 'UserId:', userId);
 
     // Parse request body
     const body = JSON.parse(event.body);
     const { to, subject, body: emailBody, cc = [], bcc = [], attachments = [] } = body;
+    console.log('Email to:', to, 'Subject:', subject);
 
     // Generate unique email ID
     const emailId = `${userId}-${Date.now()}`;
     const timestamp = new Date().toISOString();
 
-    // Prepare email message for SendGrid
+    // Prepare email message for SendGrid (official format)
     const msg = {
-      to: Array.isArray(to) ? to : [to],
-      from: {
-        email: SENDGRID_FROM_EMAIL,
-        name: userEmail
-      },
-      replyTo: userEmail,
+      to: Array.isArray(to) ? to : to,
+      from: SENDGRID_FROM_EMAIL,
       subject: subject,
-      text: emailBody.replace(/<[^>]*>/g, ''),
-      html: emailBody
+      text: emailBody.replace(/<[^>]*>/g, '') || ' ',
+      html: emailBody || ' ',
+      replyTo: userEmail
     };
 
     // Add CC and BCC if provided
@@ -54,14 +52,21 @@ exports.handler = async (event, context) => {
       msg.attachments = attachments.map(att => ({
         content: att.data,
         filename: att.filename,
-        type: att.contentType,
+        type: att.contentType || 'application/octet-stream',
         disposition: 'attachment'
       }));
     }
 
     // Send email using SendGrid
+    console.log('Sending email via SendGrid');
+    console.log('From:', SENDGRID_FROM_EMAIL);
+    console.log('To:', to);
+    console.log('Subject:', subject);
+
     const sendResult = await sgMail.send(msg);
+    console.log('SendGrid response:', JSON.stringify(sendResult[0]));
     const messageId = sendResult[0].headers['x-message-id'] || emailId;
+    console.log('Message ID:', messageId);
 
     // Store full email in S3
     const s3Key = `emails/${userId}/${emailId}.json`;
@@ -83,6 +88,7 @@ exports.handler = async (event, context) => {
     }).promise();
 
     // Store metadata in DynamoDB
+    console.log('Storing email in DynamoDB, folder: sent');
     await dynamodb.put({
       TableName: DYNAMODB_TABLE,
       Item: {
@@ -102,6 +108,7 @@ exports.handler = async (event, context) => {
         messageId
       }
     }).promise();
+    console.log('Email stored successfully');
 
     return {
       statusCode: 200,
@@ -114,11 +121,13 @@ exports.handler = async (event, context) => {
     };
   } catch (error) {
     console.error('Error sending email:', error);
+    console.error('Error details:', JSON.stringify(error.response?.body || error));
     return {
       statusCode: 500,
       headers: getCorsHeaders(),
       body: JSON.stringify({
-        message: `Error sending email: ${error.message}`
+        message: `Error sending email: ${error.message}`,
+        details: error.response?.body?.errors || error.message
       })
     };
   }
