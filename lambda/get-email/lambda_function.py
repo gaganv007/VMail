@@ -4,8 +4,8 @@ import os
 from decimal import Decimal
 
 # Initialize AWS clients
-dynamodb = boto3.resource('dynamodb', region_name=os.environ.get('AWS_REGION', 'us-east-1'))
-s3 = boto3.client('s3', region_name=os.environ.get('AWS_REGION', 'us-east-1'))
+dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
+s3 = boto3.client('s3', region_name='ap-south-2')
 
 # Environment variables
 DYNAMODB_TABLE = os.environ.get('DYNAMODB_TABLE', 'vmail-emails')

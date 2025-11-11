@@ -44,7 +44,10 @@ const EmailViewer = ({ email, onClose, onDelete }) => {
           <div className="email-date">{formatDate(email.timestamp)}</div>
         </div>
 
-        <div className="email-body">{email.body || email.preview || '(no content)'}</div>
+        <div
+          className="email-body"
+          dangerouslySetInnerHTML={{ __html: email.body || email.preview || '(no content)' }}
+        />
       </div>
     </div>
   );

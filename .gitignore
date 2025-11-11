@@ -41,3 +41,13 @@ yarn-error.log*
 # Temporary files
 /tmp/
 *.tmp
+
+# Test files with secrets
+test-sendgrid.js
+test-*.js
+
+# Sensitive files
+*.pem
+*.key
+credentials.json
+config.json

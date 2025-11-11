@@ -70,8 +70,22 @@ const GmailLayout = ({ user }) => {
     setActiveFolder(folder);
   };
 
-  const handleEmailSelect = (email) => {
-    setSelectedEmail(email);
+  const handleEmailSelect = async (email) => {
+    try {
+      console.log('Fetching full email:', email.emailId);
+      const fullEmail = await EmailService.getEmail(email.emailId);
+      console.log('Full email loaded:', fullEmail);
+      setSelectedEmail(fullEmail);
+      // Mark as read
+      if (!email.read) {
+        await EmailService.markAsRead(email.emailId);
+        // Reload emails to update read status
+        await loadEmails();
+      }
+    } catch (err) {
+      console.error('Error loading email:', err);
+      alert('Failed to load email content');
+    }
   };
 
   const handleCompose = () => {
