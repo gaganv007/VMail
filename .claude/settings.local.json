@@ -92,7 +92,9 @@
       "Bash(do echo \"Enabling CORS for resource: $resource_id\" aws apigateway put-method --rest-api-id 6izcc4sd18 --resource-id $resource_id --http-method OPTIONS --authorization-type NONE --region us-east-1)",
       "Bash(__NEW_LINE__)",
       "Bash(aws lambda get-policy:*)",
-      "Bash(aws lambda remove-permission:*)"
+      "Bash(aws lambda remove-permission:*)",
+      "Bash(node test-sendgrid.js:*)",
+      "Bash(git reset:*)"
     ],
     "deny": [],
     "ask": []
