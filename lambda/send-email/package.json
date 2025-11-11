@@ -1,10 +1,10 @@
 {
   "name": "vmail-send-email",
   "version": "1.0.0",
-  "description": "Send email using Nodemailer",
+  "description": "Send email using SendGrid",
   "main": "lambda_function.js",
   "dependencies": {
-    "nodemailer": "^6.9.7",
+    "@sendgrid/mail": "^8.1.6",
     "aws-sdk": "^2.1496.0"
   }
 }

@@ -7,7 +7,6 @@ const Sidebar = ({ activeFolder, onFolderChange, onCompose, emailCounts }) => {
     { id: 'starred', label: 'Starred', icon: '⭐', count: emailCounts.starred },
     { id: 'sent', label: 'Sent', icon: '📤', count: emailCounts.sent },
     { id: 'drafts', label: 'Drafts', icon: '📝', count: emailCounts.drafts },
-    { id: 'spam', label: 'Spam', icon: '🚫', count: emailCounts.spam },
     { id: 'trash', label: 'Trash', icon: '🗑️', count: emailCounts.trash },
   ];
 

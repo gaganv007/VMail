@@ -10,6 +10,8 @@ import './GmailLayout.css';
 const GmailLayout = ({ user }) => {
   const [activeFolder, setActiveFolder] = useState('inbox');
   const [emails, setEmails] = useState([]);
+  const [filteredEmails, setFilteredEmails] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [showCompose, setShowCompose] = useState(false);
   const [selectedEmail, setSelectedEmail] = useState(null);
@@ -18,7 +20,6 @@ const GmailLayout = ({ user }) => {
     starred: 0,
     sent: 0,
     drafts: 0,
-    spam: 0,
     trash: 0,
   });
 
@@ -31,13 +32,35 @@ const GmailLayout = ({ user }) => {
     try {
       setLoading(true);
       const response = await EmailService.listEmails(activeFolder);
-      setEmails(response.emails || []);
+      const emailList = response.emails || [];
+      setEmails(emailList);
+      setFilteredEmails(emailList);
     } catch (err) {
       console.error('Error loading emails:', err);
       setEmails([]);
+      setFilteredEmails([]);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+    if (!query.trim()) {
+      setFilteredEmails(emails);
+      return;
+    }
+
+    const searchLower = query.toLowerCase();
+    const filtered = emails.filter((email) => {
+      return (
+        email.subject?.toLowerCase().includes(searchLower) ||
+        email.from?.toLowerCase().includes(searchLower) ||
+        email.body?.toLowerCase().includes(searchLower) ||
+        email.preview?.toLowerCase().includes(searchLower)
+      );
+    });
+    setFilteredEmails(filtered);
   };
 
   const handleFolderChange = (folder) => {
@@ -77,7 +100,7 @@ const GmailLayout = ({ user }) => {
 
   return (
     <div className="gmail-layout">
-      <NavigationBar user={user} />
+      <NavigationBar user={user} onSearch={handleSearch} />
 
       <div className="gmail-main">
         <Sidebar
@@ -101,8 +124,9 @@ const GmailLayout = ({ user }) => {
             />
           ) : (
             <EmailList
-              emails={emails}
+              emails={filteredEmails}
               onEmailSelect={handleEmailSelect}
+              searchQuery={searchQuery}
             />
           )}
         </div>

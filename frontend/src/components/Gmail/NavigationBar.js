@@ -1,7 +1,17 @@
 import React from 'react';
 import './NavigationBar.css';
 
-const NavigationBar = ({ onMenuClick, user }) => {
+const NavigationBar = ({ onMenuClick, user, onSearch }) => {
+  const [searchQuery, setSearchQuery] = React.useState('');
+
+  const handleSearch = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    if (onSearch) {
+      onSearch(query);
+    }
+  };
+
   return (
     <header className="gmail-navbar">
       <div className="navbar-left">
@@ -26,13 +36,19 @@ const NavigationBar = ({ onMenuClick, user }) => {
           <svg width="20" height="20" viewBox="0 0 20 20" fill="#5f6368">
             <path d="M12.9 14.32a8 8 0 1 1 1.41-1.41l5.35 5.33-1.42 1.42-5.33-5.34zM8 14A6 6 0 1 0 8 2a6 6 0 0 0 0 12z"/>
           </svg>
-          <input type="text" placeholder="Search mail" className="search-input" />
+          <input
+            type="text"
+            placeholder="Search mail"
+            className="search-input"
+            value={searchQuery}
+            onChange={handleSearch}
+          />
         </div>
       </div>
 
       <div className="navbar-right">
         <button className="profile-btn">
-          {user?.name?.charAt(0).toUpperCase() || 'U'}
+          {user?.email?.charAt(0).toUpperCase() || user?.name?.charAt(0).toUpperCase() || 'U'}
         </button>
       </div>
     </header>
