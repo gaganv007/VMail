@@ -1,0 +1,27 @@
+{
+  "name": "vmail",
+  "version": "1.0.0",
+  "description": "Full-featured email application built with AWS services",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "lambda"
+  ],
+  "scripts": {
+    "install:all": "npm install && cd frontend && npm install && cd ../lambda && npm install",
+    "dev": "cd frontend && npm start",
+    "build": "cd frontend && npm run build",
+    "deploy:lambda": "cd lambda && ./deploy.sh",
+    "setup": "node scripts/setup-aws.js"
+  },
+  "keywords": [
+    "email",
+    "aws",
+    "ses",
+    "cognito",
+    "dynamodb",
+    "s3"
+  ],
+  "author": "",
+  "license": "MIT"
+}
