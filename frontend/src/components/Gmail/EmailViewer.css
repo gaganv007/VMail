@@ -87,3 +87,70 @@
   color: #202124;
   white-space: pre-wrap;
 }
+
+.email-attachments {
+  margin-top: 24px;
+  border-top: 1px solid #f1f3f4;
+  padding-top: 16px;
+}
+
+.attachments-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #5f6368;
+  font-size: 12px;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.attachments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.attachment-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.attachment-icon {
+  font-size: 20px;
+}
+
+.attachment-info {
+  flex: 1;
+}
+
+.attachment-name {
+  font-size: 14px;
+  color: #202124;
+  font-weight: 500;
+}
+
+.attachment-size {
+  font-size: 12px;
+  color: #5f6368;
+  margin-top: 2px;
+}
+
+.attachment-download-btn {
+  padding: 6px 16px;
+  background: #1a73e8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.attachment-download-btn:hover {
+  background: #1557b0;
+}

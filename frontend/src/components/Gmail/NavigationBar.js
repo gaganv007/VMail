@@ -1,14 +1,27 @@
 import React from 'react';
 import './NavigationBar.css';
+import { signOut } from 'aws-amplify/auth';
+import { useNavigate } from 'react-router-dom';
 
 const NavigationBar = ({ onMenuClick, user, onSearch }) => {
   const [searchQuery, setSearchQuery] = React.useState('');
+  const [showDropdown, setShowDropdown] = React.useState(false);
+  const navigate = useNavigate();
 
   const handleSearch = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
     if (onSearch) {
       onSearch(query);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate('/login');
+    } catch (error) {
+      console.error('Error signing out:', error);
     }
   };
 
@@ -47,9 +60,28 @@ const NavigationBar = ({ onMenuClick, user, onSearch }) => {
       </div>
 
       <div className="navbar-right">
-        <button className="profile-btn">
-          {user?.email?.charAt(0).toUpperCase() || user?.name?.charAt(0).toUpperCase() || 'U'}
-        </button>
+        <div className="profile-dropdown">
+          <button
+            className="profile-btn"
+            onClick={() => setShowDropdown(!showDropdown)}
+          >
+            {user?.email?.charAt(0).toUpperCase() || user?.name?.charAt(0).toUpperCase() || 'U'}
+          </button>
+          {showDropdown && (
+            <div className="dropdown-menu">
+              <div className="dropdown-item user-info">
+                <div className="user-email">{user?.email || 'User'}</div>
+              </div>
+              <div className="dropdown-divider"></div>
+              <button className="dropdown-item" onClick={handleSignOut}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{marginRight: '8px'}}>
+                  <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                </svg>
+                Sign Out
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );
