@@ -94,7 +94,10 @@
       "Bash(aws lambda get-policy:*)",
       "Bash(aws lambda remove-permission:*)",
       "Bash(node test-sendgrid.js:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(node check-sendgrid-status.js:*)",
+      "Bash(aws logs filter-log-events:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []
