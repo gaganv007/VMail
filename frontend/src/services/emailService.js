@@ -135,6 +135,61 @@ class EmailService {
     }
   }
 
+  async markAsStarred(emailId, starred) {
+    try {
+      const headers = await this.getAuthHeaders();
+      const response = await fetch(
+        `${this.apiEndpoint}/emails/${emailId}/starred`,
+        {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify({ starred })
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to mark email as starred: ${response.statusText}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error marking email as starred:', error);
+      throw error;
+    }
+  }
+
+  async saveDraft(emailData, draftId) {
+    try {
+      const headers = await this.getAuthHeaders();
+      const response = await fetch(
+        `${this.apiEndpoint}/emails/save-draft`,
+        {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            to: emailData.to,
+            subject: emailData.subject,
+            body: emailData.body,
+            cc: emailData.cc || [],
+            bcc: emailData.bcc || [],
+            attachments: emailData.attachments || [],
+            draftId
+          })
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to save draft');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error saving draft:', error);
+      throw error;
+    }
+  }
+
   async uploadAttachment(file) {
     try {
       // Convert file to base64

@@ -1,7 +1,8 @@
 import React from 'react';
+import { FiStar, FiTrash2, FiEdit2 } from 'react-icons/fi';
 import './EmailList.css';
 
-const EmailList = ({ emails = [], onEmailSelect }) => {
+const EmailList = ({ emails = [], onEmailSelect, onDelete, onStar, onEditDraft, folder }) => {
   const formatTime = (timestamp) => {
     const date = new Date(timestamp);
     const now = new Date();
@@ -17,6 +18,27 @@ const EmailList = ({ emails = [], onEmailSelect }) => {
   const getInitials = (email) => {
     if (!email) return '?';
     return email[0].toUpperCase();
+  };
+
+  const handleDelete = (e, emailId) => {
+    e.stopPropagation();
+    if (onDelete && window.confirm('Are you sure you want to delete this email?')) {
+      onDelete(emailId);
+    }
+  };
+
+  const handleStar = (e, emailId, starred) => {
+    e.stopPropagation();
+    if (onStar) {
+      onStar(emailId, !starred);
+    }
+  };
+
+  const handleEditDraft = (e, email) => {
+    e.stopPropagation();
+    if (onEditDraft) {
+      onEditDraft(email);
+    }
   };
 
   return (
@@ -43,6 +65,12 @@ const EmailList = ({ emails = [], onEmailSelect }) => {
               className={`email-item ${!email.read ? 'unread' : ''}`}
               onClick={() => onEmailSelect(email)}
             >
+              <div className="email-checkbox">
+                <input type="checkbox" />
+              </div>
+              <div className="email-star" onClick={(e) => handleStar(e, email.emailId, email.starred)}>
+                <FiStar fill={email.starred ? '#FFC000' : 'none'} color={email.starred ? '#FFC000' : '#ccc'} />
+              </div>
               <div className="email-avatar">
                 {getInitials(email.from)}
               </div>
@@ -50,10 +78,29 @@ const EmailList = ({ emails = [], onEmailSelect }) => {
                 {email.from?.split('@')[0] || 'Unknown'}
               </div>
               <div className="email-subject">
+                {email.isDraft && <span className="draft-badge">Draft</span>}
                 {email.subject || '(no subject)'}
                 {email.preview && (
                   <span className="email-preview"> - {email.preview}</span>
                 )}
+              </div>
+              <div className="email-actions">
+                {folder === 'drafts' && (
+                  <button
+                    className="action-btn"
+                    onClick={(e) => handleEditDraft(e, email)}
+                    title="Edit draft"
+                  >
+                    <FiEdit2 size={16} />
+                  </button>
+                )}
+                <button
+                  className="action-btn"
+                  onClick={(e) => handleDelete(e, email.emailId)}
+                  title={folder === 'trash' ? 'Permanently delete' : 'Delete'}
+                >
+                  <FiTrash2 size={16} />
+                </button>
               </div>
               <div className="email-time">
                 {formatTime(email.timestamp)}

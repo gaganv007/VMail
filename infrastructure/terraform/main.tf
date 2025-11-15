@@ -31,6 +31,18 @@ variable "domain_name" {
   type        = string
 }
 
+variable "sendgrid_api_key" {
+  description = "SendGrid API Key for sending emails"
+  type        = string
+  sensitive   = true
+}
+
+variable "sendgrid_from_email" {
+  description = "SendGrid verified sender email"
+  type        = string
+  default     = "noreply@vmail.com"
+}
+
 # Data sources
 data "aws_caller_identity" "current" {}
 

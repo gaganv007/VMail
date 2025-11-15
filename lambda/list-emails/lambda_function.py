@@ -55,7 +55,9 @@ def lambda_handler(event, context):
                 'preview': email.get('preview'),
                 'timestamp': email.get('timestamp'),
                 'read': email.get('read', False),
+                'starred': email.get('starred', False),
                 'hasAttachments': email.get('hasAttachments', False),
+                'isDraft': email.get('isDraft', False),
                 'folder': email.get('folder')
             })
 

@@ -1,3 +1,5 @@
-aws_region   = "us-east-1"
-project_name = "vmail"
-domain_name  = ""
+aws_region              = "us-east-1"
+project_name            = "vmail"
+domain_name             = ""
+sendgrid_api_key        = "SG.4yi8H0OORTOgRIK8Rg_JpA"
+sendgrid_from_email     = "cloudmailproject@gmail.com"

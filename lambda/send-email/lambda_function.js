@@ -103,9 +103,11 @@ exports.handler = async (event, context) => {
         timestamp,
         folder: 'sent',
         read: true,
+        starred: false,
         hasAttachments: attachments.length > 0,
         s3Key,
-        messageId
+        messageId,
+        isDraft: false
       }
     }).promise();
     console.log('Email stored successfully');

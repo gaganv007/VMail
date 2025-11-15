@@ -49,7 +49,7 @@
   padding: 0 16px;
   border-bottom: 1px solid #f1f3f4;
   cursor: pointer;
-  gap: 16px;
+  gap: 8px;
 }
 
 .email-item:hover {
@@ -113,4 +113,63 @@
   justify-content: center;
   height: 100%;
   color: #5f6368;
+}
+
+.email-checkbox {
+  width: 24px;
+  flex-shrink: 0;
+}
+
+.email-checkbox input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.email-star {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.email-star:hover {
+  transform: scale(1.2);
+}
+
+.draft-badge {
+  display: inline-block;
+  background: #EA4335;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.email-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #5f6368;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.action-btn:hover {
+  background: #f1f3f4;
+  color: #202124;
 }

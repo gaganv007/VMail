@@ -91,6 +91,35 @@ export const EmailProvider = ({ children }) => {
     }
   }, [emails]);
 
+  const markAsStarred = useCallback(async (emailId, starred) => {
+    try {
+      await emailService.markAsStarred(emailId, starred);
+      // Update local state
+      setEmails(emails.map(email =>
+        email.emailId === emailId ? { ...email, starred } : email
+      ));
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    }
+  }, [emails]);
+
+  const saveDraft = useCallback(async (emailData, draftId) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await emailService.saveDraft(emailData, draftId);
+      // Refresh drafts
+      await fetchEmails('drafts');
+      return result;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchEmails]);
+
   const value = {
     emails,
     loading,
@@ -100,7 +129,9 @@ export const EmailProvider = ({ children }) => {
     getEmail,
     sendEmail,
     deleteEmail,
-    markAsRead
+    markAsRead,
+    markAsStarred,
+    saveDraft
   };
 
   return <EmailContext.Provider value={value}>{children}</EmailContext.Provider>;

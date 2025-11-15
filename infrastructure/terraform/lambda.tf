@@ -83,15 +83,17 @@ resource "aws_lambda_function" "send_email" {
   filename         = "${path.module}/send-email.zip"
   function_name    = "${var.project_name}-send-email"
   role            = aws_iam_role.lambda_execution.arn
-  handler         = "lambda_function.lambda_handler"
-  runtime         = "python3.9"
+  handler         = "lambda_function.handler"
+  runtime         = "nodejs18.x"
   timeout         = 30
   memory_size     = 256
 
   environment {
     variables = {
-      DYNAMODB_TABLE = aws_dynamodb_table.emails.name
-      S3_BUCKET      = aws_s3_bucket.emails.id
+      DYNAMODB_TABLE        = aws_dynamodb_table.emails.name
+      S3_BUCKET             = aws_s3_bucket.emails.id
+      SENDGRID_API_KEY      = var.sendgrid_api_key
+      SENDGRID_FROM_EMAIL   = var.sendgrid_from_email
     }
   }
 

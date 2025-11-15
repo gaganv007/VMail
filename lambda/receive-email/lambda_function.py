@@ -120,9 +120,11 @@ def lambda_handler(event, context):
                         'timestamp': timestamp,
                         'folder': 'inbox',
                         'read': False,
+                        'starred': False,
                         'hasAttachments': len(attachments) > 0,
                         's3Key': s3_key,
-                        'messageId': message_id
+                        'messageId': message_id,
+                        'isDraft': False
                     }
                 )
 

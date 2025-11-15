@@ -60,7 +60,7 @@ function App() {
               />
               <Route
                 path="/*"
-                element={isAuthenticated ? <GmailLayout user={user} /> : <Navigate to="/login" />}
+                element={isAuthenticated ? <GmailLayout user={user} onLogout={checkAuthState} /> : <Navigate to="/login" />}
               />
             </Routes>
           </div>

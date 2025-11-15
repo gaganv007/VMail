@@ -1,12 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './ComposeWindow.css';
 
-const ComposeWindow = ({ onClose, onSend }) => {
+const ComposeWindow = ({ onClose, onSend, onSaveDraft, draftId, draft }) => {
   const [to, setTo] = useState('');
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [sending, setSending] = useState(false);
   const [attachments, setAttachments] = useState([]);
+  const [isDraft, setIsDraft] = useState(false);
+
+  useEffect(() => {
+    if (draft && draftId) {
+      setTo(draft.to?.join(', ') || '');
+      setSubject(draft.subject || '');
+      setBody(draft.body || '');
+      setAttachments(draft.attachments || []);
+      setIsDraft(true);
+    }
+  }, [draft, draftId]);
 
   const handleFileSelect = async (e) => {
     const files = Array.from(e.target.files);
@@ -50,11 +61,23 @@ const ComposeWindow = ({ onClose, onSend }) => {
     }
   };
 
+  const handleSaveDraft = async () => {
+    setSending(true);
+    try {
+      await onSaveDraft({ to, subject, body, attachments }, draftId);
+      onClose();
+    } catch (err) {
+      alert('Failed to save draft: ' + err.message);
+    } finally {
+      setSending(false);
+    }
+  };
+
   return (
     <div className="compose-overlay" onClick={onClose}>
       <div className="compose-window" onClick={(e) => e.stopPropagation()}>
         <div className="compose-header">
-          <div className="compose-title">New Message</div>
+          <div className="compose-title">{isDraft ? 'Edit Draft' : 'New Message'}</div>
           <button className="compose-close" onClick={onClose}>
             ✕
           </button>
@@ -120,6 +143,13 @@ const ComposeWindow = ({ onClose, onSend }) => {
             disabled={sending}
           >
             {sending ? 'Sending...' : 'Send'}
+          </button>
+          <button
+            className="compose-draft-btn"
+            onClick={handleSaveDraft}
+            disabled={sending}
+          >
+            {sending ? 'Saving...' : 'Save Draft'}
           </button>
           <label className="compose-attach-btn">
             <input
