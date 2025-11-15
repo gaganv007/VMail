@@ -25,12 +25,14 @@ const GmailLayout = ({ user, onLogout }) => {
   });
   const [editingDraftId, setEditingDraftId] = useState(null);
 
+  // Load emails when component mounts and when folder changes
   useEffect(() => {
     loadEmails();
     loadEmailCounts();
     // Set up auto-load every 30 seconds
     const interval = setInterval(() => {
       loadEmails();
+      loadEmailCounts();
     }, 30000);
     return () => clearInterval(interval);
     // eslint-disable-next-line
@@ -40,9 +42,26 @@ const GmailLayout = ({ user, onLogout }) => {
     try {
       setLoading(true);
       console.log('Loading emails for folder:', activeFolder);
-      const response = await EmailService.listEmails(activeFolder);
-      console.log('Received emails:', response);
-      const emailList = response.emails || [];
+      
+      let emailList = [];
+      
+      // For starred folder, fetch all folders and filter by starred
+      if (activeFolder === 'starred') {
+        const folders = ['inbox', 'sent', 'drafts'];
+        const allEmails = [];
+        for (const folder of folders) {
+          const response = await EmailService.listEmails(folder);
+          const folderEmails = response.emails || [];
+          allEmails.push(...folderEmails.filter(e => e.starred));
+        }
+        emailList = allEmails;
+      } else {
+        // For other folders, fetch normally
+        const response = await EmailService.listEmails(activeFolder);
+        emailList = response.emails || [];
+      }
+      
+      console.log('Received emails:', emailList);
       console.log('Email count:', emailList.length);
       setEmails(emailList);
       setFilteredEmails(emailList);
@@ -63,9 +82,14 @@ const GmailLayout = ({ user, onLogout }) => {
         const response = await EmailService.listEmails(folder);
         counts[folder] = response.emails?.length || 0;
       }
-      // Get starred count separately
-      const inboxResponse = await EmailService.listEmails('inbox');
-      counts.starred = inboxResponse.emails?.filter(e => e.starred)?.length || 0;
+      // Get starred count from all folders (inbox, sent, drafts)
+      let starredCount = 0;
+      const starredFolders = ['inbox', 'sent', 'drafts'];
+      for (const folder of starredFolders) {
+        const response = await EmailService.listEmails(folder);
+        starredCount += (response.emails?.filter(e => e.starred)?.length || 0);
+      }
+      counts.starred = starredCount;
       setEmailCounts(counts);
     } catch (err) {
       console.error('Error loading email counts:', err);

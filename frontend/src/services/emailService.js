@@ -139,7 +139,7 @@ class EmailService {
     try {
       const headers = await this.getAuthHeaders();
       const response = await fetch(
-        `${this.apiEndpoint}/emails/${emailId}/starred`,
+        `${this.apiEndpoint}${apiConfig.endpoints.getEmail}/${emailId}/starred`,
         {
           method: 'PUT',
           headers,
@@ -162,7 +162,7 @@ class EmailService {
     try {
       const headers = await this.getAuthHeaders();
       const response = await fetch(
-        `${this.apiEndpoint}/emails/save-draft`,
+        `${this.apiEndpoint}${apiConfig.endpoints.sendEmail.replace('/send', '/save-draft')}`,
         {
           method: 'POST',
           headers,
